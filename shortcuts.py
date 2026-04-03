@@ -123,6 +123,18 @@ def try_quick_click(prompt: str, url: str, seed: str | None, step: int) -> list[
             return _click("id", "toggle-future-events")
         return []
 
+    # Date picker month navigation (generic, all sites with calendar pickers)
+    if re.search(r"next\s+month|go\s+to\s+next\s+month|navigate.*next\s+month", t):
+        return [{"type": "ClickAction", "selector": _sel_attr("name", "next-month")}]
+    if re.search(r"prev(ious)?\s+month|go\s+to\s+prev|navigate.*prev", t):
+        return [{"type": "ClickAction", "selector": _sel_attr("name", "previous-month")}]
+
+    # Generic pagination shortcuts
+    if re.search(r"(go\s+to\s+|click\s+)?(the\s+)?next\s+page", t):
+        return _click_xpath("//button[@aria-label='Next page' or @aria-label='next page' or contains(@class,'next-page') or contains(@id,'next-page')]")
+    if re.search(r"(go\s+to\s+|click\s+)?(the\s+)?prev(ious)?\s+page", t):
+        return _click_xpath("//button[@aria-label='Previous page' or @aria-label='previous page' or contains(@class,'prev-page') or contains(@id,'prev-page')]")
+
     # Enter location (autodrive 8012)
     if port == 8012:
         _loc_xpath = ("//input[contains(@placeholder, 'Pickup location') or "
